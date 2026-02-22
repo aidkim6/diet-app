@@ -22,3 +22,12 @@ ul {
   list-style: none;
   padding: 0;
 }
+
+li {
+  margin: 5px 0;
+}
+
+/*달력*/
+table { border-collapse: collapse; margin: 10px auto; }
+td, th { border: 1px solid #ccc; width: 40px; height: 40px; text-align: center; vertical-align: middle; }
+.hasData { background-color: #a0e7a0; cursor: pointer; }

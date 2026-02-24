@@ -1,12 +1,27 @@
-# diet-app
-Frontend beginner project – Diet Tracker
-This is a simple diet management app built by **aidkim6**.  
+#  Health Tracker
 
-### Features
+A simple health management web app built with HTML, CSS, and JavaScript.
+
+##  Features
+
 - Add meals with name and calories
-- See total calories for the day
+- View total daily calories
 - Delete meals
-- View meals on a calendar
+- Monthly calendar with highlighted dates
+- Navigate between months
+- BMI calculator
 
-### Technologies
-HTML, CSS, JavaScript (Frontend only)
+##  Technologies Used
+
+- HTML
+- CSS
+- JavaScript
+- localStorage (for data persistence)
+
+##  Project Description
+
+This project was created as a frontend practice project.  
+It focuses on DOM manipulation, data management, and UI structuring without using any frameworks.
+
+---
+Developed by **aidkim6**

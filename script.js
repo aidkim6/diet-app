@@ -1,36 +1,42 @@
 // ---------------------- HTML 요소 선택 ----------------------
-const dateInput = document.getElementById("dateInput");   // 날짜 입력
-const nameInput = document.getElementById("nameInput");   // 음식 이름 입력
-const calInput = document.getElementById("calInput");     // 칼로리 입력
-const addBtn = document.getElementById("addBtn");         // 추가 버튼
-const list = document.getElementById("list");            // 식단 리스트 ul
-const totalCalories = document.getElementById("totalCalories"); // 총 칼로리 표시
-const calendar = document.getElementById("calendar");    // 달력 테이블
+const dateInput = document.getElementById("dateInput");
+const nameInput = document.getElementById("nameInput");
+const calInput = document.getElementById("calInput");
+const addBtn = document.getElementById("addBtn");
+const list = document.getElementById("list");
+const totalCalories = document.getElementById("totalCalories");
+const calendar = document.getElementById("calendar");
+const prevMonth = document.getElementById("prevMonth");
+const nextMonth = document.getElementById("nextMonth");
+const monthTitle = document.getElementById("monthTitle");
+// BMI 요소
+const heightInput = document.getElementById("heightInput");
+const weightInput = document.getElementById("weightInput");
+const bmiBtn = document.getElementById("bmiBtn");
+const bmiResult = document.getElementById("bmiResult");
 
-// ---------------------- localStorage 불러오기 ----------------------
-let dietData = JSON.parse(localStorage.getItem("dietData")) || {}; 
-// 저장된 식단이 있으면 불러오고, 없으면 빈 객체 생성
+// ---------------------- localStorage ----------------------
+let dietData = JSON.parse(localStorage.getItem("dietData")) || {};
 
 // ---------------------- 리스트 렌더링 ----------------------
 function renderList(date) {
-  list.innerHTML = ""; // 기존 리스트 초기화
-  let total = 0;       // 총 칼로리 초기화
+  list.innerHTML = "";
+  let total = 0;
 
   if (dietData[date]) {
     dietData[date].forEach((item, index) => {
-      total += item.calories; // 총 칼로리 계산
+      total += item.calories;
 
       const li = document.createElement("li");
       li.textContent = `${item.name} - ${item.calories} kcal `;
 
-      // ---------------------- 삭제 버튼 ----------------------
       const delBtn = document.createElement("button");
       delBtn.textContent = "x";
       delBtn.addEventListener("click", () => {
-        dietData[date].splice(index, 1); // 배열에서 제거
-        localStorage.setItem("dietData", JSON.stringify(dietData)); // localStorage 갱신
-        renderList(date);  // 리스트 갱신
-        renderCalendar(currentYear, currentMonth); // 달력 갱신
+        dietData[date].splice(index, 1);
+        localStorage.setItem("dietData", JSON.stringify(dietData));
+        renderList(date);
+        renderCalendar(currentYear, currentMonth);
       });
 
       li.appendChild(delBtn);
@@ -38,98 +44,136 @@ function renderList(date) {
     });
   }
 
-  totalCalories.textContent = total; // 총 칼로리 업데이트
+  totalCalories.textContent = total;
 }
 
-// ---------------------- 추가 버튼 클릭 ----------------------
+// ---------------------- 추가 버튼 ----------------------
 addBtn.addEventListener("click", () => {
-  const date = dateInput.value;          // 선택한 날짜
-  const name = nameInput.value.trim();   // 음식 이름
-  const cal = parseInt(calInput.value);  // 칼로리 숫자 변환
+  const date = dateInput.value;
+  const name = nameInput.value.trim();
+  const cal = parseInt(calInput.value);
 
-  // 입력 검사
   if (!name || isNaN(cal)) return alert("이름과 칼로리를 정확히 입력해주세요!");
 
-  if (!dietData[date]) dietData[date] = [];       // 해당 날짜 배열 없으면 생성
-  dietData[date].push({ name, calories: cal });   // 데이터 추가
-  localStorage.setItem("dietData", JSON.stringify(dietData)); // 저장
+  if (!dietData[date]) dietData[date] = [];
+  dietData[date].push({ name, calories: cal });
 
-  renderList(date);            // 리스트 갱신
-  renderCalendar(currentYear, currentMonth); // 달력 갱신
+  localStorage.setItem("dietData", JSON.stringify(dietData));
 
-  nameInput.value = "";        // 입력 초기화
+  renderList(date);
+  renderCalendar(currentYear, currentMonth);
+
+  nameInput.value = "";
   calInput.value = "";
 });
 
-// ---------------------- 날짜 선택 변경 시 ----------------------
+// ---------------------- 날짜 변경 ----------------------
 dateInput.addEventListener("change", () => {
-  renderList(dateInput.value); // 선택한 날짜의 리스트 렌더링
+  renderList(dateInput.value);
 });
 
-// ---------------------- 달력 기능 ----------------------
+// ---------------------- 달력 ----------------------
 let today = new Date();
 let currentYear = today.getFullYear();
 let currentMonth = today.getMonth();
 
-// 달력 렌더링 함수
 function renderCalendar(year, month) {
-  calendar.innerHTML = ""; // 기존 달력 초기화
+  calendar.innerHTML = "";
 
-  const firstDay = new Date(year, month, 1).getDay();    // 달의 첫날 요일
-  const lastDate = new Date(year, month + 1, 0).getDate(); // 달의 마지막 날짜
+  monthTitle.textContent = `${year}년 ${month + 1}월`;
 
-  // ---------------------- 요일 헤더 ----------------------
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+
   const days = ["일","월","화","수","목","금","토"];
   let thead = document.createElement("thead");
   let tr = document.createElement("tr");
+
   days.forEach(d => {
     let th = document.createElement("th");
     th.textContent = d;
     tr.appendChild(th);
   });
+
   thead.appendChild(tr);
   calendar.appendChild(thead);
 
-  // ---------------------- 날짜 채우기 ----------------------
   let tbody = document.createElement("tbody");
   tr = document.createElement("tr");
 
-  // 달력 첫 줄 공백
-  for (let i = 0; i < firstDay; i++) tr.appendChild(document.createElement("td"));
+  for (let i = 0; i < firstDay; i++) {
+    tr.appendChild(document.createElement("td"));
+  }
 
   for (let date = 1; date <= lastDate; date++) {
     let td = document.createElement("td");
     const fullDate = `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
     td.textContent = date;
 
-    // 데이터 있는 날짜 표시
     if (dietData[fullDate] && dietData[fullDate].length > 0) {
-      td.classList.add("hasData"); // 스타일 적용 (초록색)
-      td.title = "식단 있음";
-
+      td.classList.add("hasData");
       td.addEventListener("click", () => {
-        dateInput.value = fullDate;  // 날짜 선택
-        renderList(fullDate);        // 리스트 렌더링
+        dateInput.value = fullDate;
+        renderList(fullDate);
       });
     }
 
     tr.appendChild(td);
 
-    // 7일마다 줄 바꿈
     if ((date + firstDay) % 7 === 0) {
       tbody.appendChild(tr);
       tr = document.createElement("tr");
     }
   }
 
-  // 마지막 줄 추가
   tbody.appendChild(tr);
   calendar.appendChild(tbody);
 }
 
-// ---------------------- 페이지 로드 시 초기화 ----------------------
+// ---------------------- BMI 계산 ----------------------
+bmiBtn.addEventListener("click", () => {
+  const height = parseFloat(heightInput.value) / 100;
+  const weight = parseFloat(weightInput.value);
+
+  if (!height || !weight) {
+    return alert("키와 몸무게를 입력해주세요!");
+  }
+
+  const bmi = (weight / (height * height)).toFixed(1);
+
+  let status = "";
+  if (bmi < 18.5) status = "저체중";
+  else if (bmi < 23) status = "정상";
+  else if (bmi < 25) status = "과체중";
+  else status = "비만";
+
+  bmiResult.textContent = `BMI: ${bmi} (${status})`;
+});
+
+//---------------------달 이동 버튼-----------------
+prevMonth.addEventListener("click", () => {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  }
+  renderCalendar(currentYear, currentMonth);
+});
+
+nextMonth.addEventListener("click", () => {
+  currentMonth++;
+  if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  renderCalendar(currentYear, currentMonth);
+});
+
+
+// ---------------------- 초기 실행 ----------------------
 window.addEventListener("load", () => {
-  if (!dateInput.value) dateInput.valueAsDate = today; // 오늘 날짜 설정
-  renderList(dateInput.value);           // 리스트 렌더링
-  renderCalendar(currentYear, currentMonth); // 달력 렌더링
+  dateInput.valueAsDate = today;
+  renderList(dateInput.value);
+  renderCalendar(currentYear, currentMonth);
 });
